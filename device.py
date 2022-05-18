@@ -18,8 +18,8 @@ class Device(object):
             self.location = device_check['location']
 
     def device_known(self, data):
-        '''Return a str (given name of the device) or None
-
+        '''
+        Return a str (given name of the device) or None
         Checks whether the device is contained in the Dictonary (based on the mac address)
         '''
         mac = ''
