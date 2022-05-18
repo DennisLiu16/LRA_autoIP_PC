@@ -1,0 +1,4 @@
+# ignore all except RasPI_MAC.json
+* 
+!.gitignore
+!RasPI_MAC.json 

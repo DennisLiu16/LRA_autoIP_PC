@@ -1,0 +1,30 @@
+{
+    "devices": [
+        {
+            "wifi-name": "nthu",
+            "MAC": "e4:5f:01:56:81:79"
+        },
+
+        {
+            "wifi-name":"nthu2",
+            "MAC":"test2"
+        },
+
+        {
+            "name":"nthu3",
+            "MAC":"test3"
+        }
+    ],
+
+    "test_devices": [
+        {
+            "wifi-name": "LabComputer",
+            "MAC": "bc:0f:9a:e6:ec:c5"
+        },
+
+        {
+            "wifi-name": "Unknown1",
+            "MAC": "7c:c2:c6:16:b4:4a"
+        }
+    ]
+}

@@ -1,0 +1,191 @@
+'''
+    PYTHON-NETWORK-SCANNER
+    Copyright (C) 2021  devmarcstorm
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+    https://stackoverflow.com/questions/15335753/nmap-not-found-class-nmap-nmap-portscannererror
+
+'''
+
+# import region
+from getmac import get_mac_address
+from matplotlib.font_manager import json_load
+from matplotlib.pyplot import flag
+from prettytable import PrettyTable
+
+from datetime import date
+
+from regex import F
+
+from device import Device
+from network import Network
+
+import json
+import os
+import sys
+
+class IpScanner(object):
+    def __init__(self, args) -> None:
+        pass
+
+    def create_device_list(self, devices, data):
+        pass
+
+    def create_mac_ip_dict(self, devices):
+        pass
+
+    def get_MAC_from_json(self, path, category):
+        pass
+
+def create_device_list(devices, data):
+    ''' Return a dictonary like {'known': [], 'unknown': []}
+
+    Creates 2 lists from devices (class Device) and makes them available in a dictionary
+       - 'known': list of known devices (mac address included in the data/device.json)
+       - 'unknown': list of unknown devices (not included)
+    '''
+    known_devices = []
+    unknown_devices = []
+
+    for host, info in devices:
+        device = Device(info['mac'], host, info['hostnames'][0]['name'], data)
+        if device.name:
+            known_devices.append(device)
+        else:
+            unknown_devices.append(device)
+
+    return {'known': known_devices, 'unknown': unknown_devices}
+
+def create_mac_ip_dict(devices):
+    mac_ip_dict = {}
+    for host, info in devices:
+        mac_ip_dict[info['mac']] = host
+    return mac_ip_dict
+
+def get_MAC_from_json(path, category):
+    pass
+
+def args_check(args):
+
+    flags = {}
+
+    if len(args) == 1:
+        return flags
+
+    # args --enableall
+    labels = ['--enableall']
+    if any(label in args for label in labels):
+        enable_all = True
+        flags['func_all'] = True
+    else:
+        enable_all = False
+
+    # args --verbose
+    labels = ['--verbose', '-v']
+    if enable_all or any(label in args for label in labels):
+        flags['func_verbose'] = True
+
+    # args --log
+    labels = ['--log', '-l']
+    if  enable_all or any(label in args for label in labels):
+        flags['func_verbose'] = True
+        flags['func_log'] = True
+
+    return flags
+    
+if __name__ == '__main__':
+
+    flags = args_check(sys.argv)
+
+    # device.json
+    dataPath = 'data'
+    try:
+        with open("{}/devices.json".format(dataPath), "r") as readFile:
+                json_devices = json.load(readFile)
+    except FileNotFoundError:
+                json_devices = {}
+
+#                 print('''No valid "data/devices.json" found. Please create one with the following format:
+# {
+#     "00:00:00:00:00:00":
+#     {
+#       "type": "Device",
+#       "owner": "John Appleseed",
+#       "location": null,
+#       "allowed": true
+#     }
+# }
+#             ''')
+
+    # Main
+    network = Network()
+
+    try:
+        devices = network.get_devices()
+    except KeyboardInterrupt:
+        print('You stopped scanning. Scanning may take a while. If it takes too long, there may be a problem with the connection. Did you specify the correct network?')
+        sys.exit()
+
+    for host, info in devices:
+        info['mac'] = get_mac_address(ip=host)
+
+    if 'func_verbose' in flags:
+        data = create_device_list(devices, json_devices)
+        log_text = ''
+
+        table = PrettyTable()
+        table.field_names = ["MAC ADDRESS", "IP", "NAME IN NETWORK", "NAME", 'LOCATION', 'ALLOWED']
+        for device in data['known']:
+            table.add_row(device.to_list())
+            log_text += '{}\n'.format(device.to_string())
+        
+        print('Known Devices\n{}'.format(table))
+
+        table = PrettyTable()
+        table.field_names = ["MAC ADDRESS", "IP", "NAME IN NETWORK"]
+        for device in data['unknown']:
+            table.add_row(device.to_list()[:3])
+            log_text += '{}\n'.format(device.to_string())
+        
+        print('Unknown Devices\n{}'.format(table))
+
+        print('Total : {} devices'.format(len(data['known'])+len(data['unknown'])))
+
+        if not os.path.isdir(dataPath):
+            os.mkdir(dataPath)
+
+        if 'func_log' in flags:
+            with open("{}/{}.log".format(dataPath, date.today()), "a") as appendFile:
+                appendFile.write(log_text)
+                print('You can find a log file with all devices in "data/{}.log"'.format(date.today()))
+
+
+    mac_ip_map = create_mac_ip_dict(devices)
+    
+    # read from MAC.json
+    MAC_json_path =  dataPath + '/RasPI_MAC.json'
+    MAC_array = json_load(MAC_json_path)
+    MAC_test_devices = MAC_array['test_devices']
+
+    # turn into MAC_list
+    target_MACs = [device['MAC'] for device in MAC_test_devices]
+    target_IPs = network.findIP_of_MACs(target_MACs, mac_ip_map)
+
+    table = PrettyTable()
+    table.field_names = ["TARGET MAC", "IP"]
+    for idx in range(len(target_IPs)):
+        table.add_row([target_MACs[idx], target_IPs[idx]])
+    
+    print('\n\nTarget IP\n{}'.format(table))
