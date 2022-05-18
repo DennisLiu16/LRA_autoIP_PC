@@ -36,19 +36,6 @@ import json
 import os
 import sys
 
-class IpScanner(object):
-    def __init__(self, args) -> None:
-        pass
-
-    def create_device_list(self, devices, data):
-        pass
-
-    def create_mac_ip_dict(self, devices):
-        pass
-
-    def get_MAC_from_json(self, path, category):
-        pass
-
 def create_device_list(devices, data):
     ''' Return a dictonary like {'known': [], 'unknown': []}
 
@@ -74,8 +61,15 @@ def create_mac_ip_dict(devices):
         mac_ip_dict[info['mac']] = host
     return mac_ip_dict
 
-def get_MAC_from_json(path, category):
-    pass
+def get_MAC_from_json(path, category, network, mac_ip_map):
+    MAC_array = json_load(path)
+    MAC_devices = MAC_array[category]
+
+    # turn into MAC list
+    target_MACs = [device['MAC'] for device in MAC_devices]
+    target_IPs = network.findIP_of_MACs(target_MACs, mac_ip_map)
+
+    return target_IPs, target_MACs
 
 def args_check(args):
 
@@ -176,12 +170,7 @@ if __name__ == '__main__':
     
     # read from MAC.json
     MAC_json_path =  dataPath + '/RasPI_MAC.json'
-    MAC_array = json_load(MAC_json_path)
-    MAC_test_devices = MAC_array['test_devices']
-
-    # turn into MAC_list
-    target_MACs = [device['MAC'] for device in MAC_test_devices]
-    target_IPs = network.findIP_of_MACs(target_MACs, mac_ip_map)
+    target_IPs, target_MACs = get_MAC_from_json(MAC_json_path, 'test_devices', network, mac_ip_map)
 
     table = PrettyTable()
     table.field_names = ["TARGET MAC", "IP"]
@@ -189,3 +178,10 @@ if __name__ == '__main__':
         table.add_row([target_MACs[idx], target_IPs[idx]])
     
     print('\n\nTarget IP\n{}'.format(table))
+
+    ########################################################################################################
+
+    # we can get target ip so prepare to
+    import webbrowser
+    default_port = 8000
+    webbrowser.open('http://' + str(target_IPs[0]) + ':' + str(default_port) + '/request_ip')
