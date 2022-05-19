@@ -120,7 +120,7 @@ if __name__ == '__main__':
 #             ''')
 
     # Main
-    network = Network()
+    network = Network(input('Input IP segment you want to search, default is your current IP: \n'))
 
     try:
         devices = network.get_devices()
