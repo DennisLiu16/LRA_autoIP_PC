@@ -20,7 +20,6 @@
 '''
 
 # import region
-from inspect import trace
 import traceback
 from nmap import PortScanner
 from LocalHostInfo import LocalHostInfo
@@ -29,7 +28,7 @@ class Network(LocalHostInfo):
     def __init__(self, ip_seg=None):
         try:
             LocalHostInfo.get_info(self)
-            if ip_seg == None:
+            if ip_seg == None or ip_seg == '':
                 # default - scan host ip segment 
                 self.target_ip_seg = self.myip
             else:
@@ -54,8 +53,11 @@ class Network(LocalHostInfo):
 
         p_scanner = PortScanner()
         print('\nScanning {}...'.format(network_to_scan))
-        p_scanner.scan(hosts=network_to_scan, arguments='-sn') 
+        p_scanner.scan(hosts=network_to_scan, arguments='-sn -sP -PE -PA21,23,80,3389 -T 5')   # you should tune here 
         device_list = [(device, p_scanner[device]) for device in p_scanner.all_hosts()]
+
+        # should sort here
+
         print('Scanning Over\n')
         return device_list
     

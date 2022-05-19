@@ -22,13 +22,9 @@
 # import region
 from getmac import get_mac_address
 from matplotlib.font_manager import json_load
-from matplotlib.pyplot import flag
 from prettytable import PrettyTable
 
 from datetime import date
-
-from regex import F
-
 from device import Device
 from network import Network
 
@@ -182,6 +178,8 @@ if __name__ == '__main__':
     ########################################################################################################
 
     # we can get target ip so prepare to
-    import webbrowser
-    default_port = 8000
-    webbrowser.open('http://' + str(target_IPs[0]) + ':' + str(default_port) + '/request_ip')
+    search_success = (target_IPs[0] != None)
+    if search_success:
+        import webbrowser
+        default_port = 8000
+        webbrowser.open('http://' + str(target_IPs[0]) + ':' + str(default_port) + '/request_ip')
