@@ -166,7 +166,7 @@ if __name__ == '__main__':
     
     # read from MAC.json
     MAC_json_path =  dataPath + '/RasPI_MAC.json'
-    target_IPs, target_MACs = get_MAC_from_json(MAC_json_path, 'test_devices', network, mac_ip_map)
+    target_IPs, target_MACs = get_MAC_from_json(MAC_json_path, 'devices', network, mac_ip_map)
 
     table = PrettyTable()
     table.field_names = ["TARGET MAC", "IP"]
@@ -178,8 +178,9 @@ if __name__ == '__main__':
     ########################################################################################################
 
     # we can get target ip so prepare to
-    search_success = (target_IPs[0] != None)
-    if search_success:
-        import webbrowser
-        default_port = 8000
-        webbrowser.open('http://' + str(target_IPs[0]) + ':' + str(default_port) + '/request_ip')
+    import webbrowser
+    for ip in target_IPs:
+        search_success = (ip != None)
+        if search_success:
+            default_port = 8000
+            webbrowser.open('http://' + str(ip) + ':' + str(default_port) + '/request_ip')
