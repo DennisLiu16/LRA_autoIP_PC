@@ -19,6 +19,21 @@
 
 '''
 
+'''
+    You need to install:
+    1. pip install getmac
+    2. pip install matplotlib
+    3. pip install prettytable
+    4. install nmap from: https://nmap.org/download#windows
+    5. install npcap from: https://npcap.com/#:~:text=Downloading%20and%20Installing%20Npcap%20Free%20Edition
+    
+    # if you can't find any devices in your local network, try to 
+    1. open cmd
+    2. run nmap -T4 -sn 192.168.0.1/24
+    3. if you see can't open eth0/ eth1. Make sure you have npcap installed!
+    ref: https://github.com/nmap/npcap/issues/335
+'''
+
 # import region
 from getmac import get_mac_address
 from matplotlib.font_manager import json_load
@@ -178,9 +193,9 @@ if __name__ == '__main__':
     ########################################################################################################
 
     # we can get target ip so prepare to
-    import webbrowser
-    for ip in target_IPs:
-        search_success = (ip != None)
-        if search_success:
-            default_port = 8000
-            webbrowser.open('http://' + str(ip) + ':' + str(default_port) + '/request_ip')
+    # import webbrowser
+    # for ip in target_IPs:
+    #     search_success = (ip != None)
+    #     if search_success:
+    #         default_port = 8000
+    #         webbrowser.open('http://' + str(ip) + ':' + str(default_port) + '/request_ip')
