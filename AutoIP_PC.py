@@ -24,14 +24,17 @@
     1. pip install getmac
     2. pip install matplotlib
     3. pip install prettytable
-    4. install nmap from: https://nmap.org/download#windows
+    4. install nmap from: https://nmap.org/download#windows, also run pip install python-nmap
     5. install npcap from: https://npcap.com/#:~:text=Downloading%20and%20Installing%20Npcap%20Free%20Edition
+    6. scapy, pip install --pre scapy[basic]
     
     # if you can't find any devices in your local network, try to 
     1. open cmd
-    2. run nmap -T4 -sn 192.168.0.1/24
+    2. run nmap -T4 -sn 192.168.0.1-255 -> tune params in network.py. Default is nmap 192.168.1.1-255 -T4 -sn
     3. if you see can't open eth0/ eth1. Make sure you have npcap installed!
     ref: https://github.com/nmap/npcap/issues/335
+
+    # 拿到對應的 adapter ip https://stackoverflow.com/questions/29913516/how-to-get-meaningful-network-interface-names-instead-of-guids-with-netifaces-un
 '''
 
 # import region
@@ -42,6 +45,8 @@ from prettytable import PrettyTable
 from datetime import date
 from device import Device
 from network import Network
+
+from scapy.all import *
 
 import json
 import os
@@ -133,6 +138,8 @@ if __name__ == '__main__':
 #     }
 # }
 #             ''')
+
+    # test region
 
     # Main
     network = Network(input('Input IP segment you want to search, default is your current IP: \n'))
