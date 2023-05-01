@@ -52,7 +52,7 @@ def filter_windows_adapter(type, phy=True):
     return di
 
 if __name__ == '__main__':
-  adapters = filter_windows_adapter('wifi', False)
+  adapters = filter_windows_adapter('wifi', True)
   for key in adapters:
     print(adapters[key].description)
 ## features
